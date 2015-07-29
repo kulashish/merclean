@@ -1,0 +1,60 @@
+hierCluster <- function(tdm, cut=5){
+  tdm.sparse <- removeSparseTerms(tdm, sparse=0.95)
+  mat <- as.matrix(tdm.sparse)
+  distMat <- dist(scale(mat))
+  fit <- hclust(distMat, method="ward")
+  plot(fit, cex=0.9, hang=-1, main="Cluster Dendrogram")
+  rect.hclust(fit, cut)
+}
+
+wCloud <- function(tdm){
+  findFreqTerms(tdm, lowfreq=50)
+  library(wordcloud)
+  mat <- as.matrix(tdm)
+  wordFreq.sort <- sort(rowSums(mat), decreasing=T)
+  set.seed(1234)
+  grayscales <- gray((wordFreq.sort + 10) / (max(wordFreq.sort) + 10))
+  word.cloud <- wordcloud(words=names(wordFreq.sort), freq=wordFreq.sort,min.freq=10,random.order=F, colors=grayscales)
+}
+
+library(YodleeInsightsConnector)
+conn <- YodleeInsightsConnector.connect("askul", "@SkU1Y0dl33")
+jcp.q114 <- YodleeInsightsConnector.query(conn, "select description from ygm_yod_biuser.jcp_card_cleanup where quarter_year='Q313' and flag=1")
+
+library(tm)
+jcp.q114.corpus <- Corpus(VectorSource(jcp.q114$description))
+jcp.q114.corpus <- tm_map(jcp.q114.corpus, tolower)
+jcp.q114.corpus <- tm_map(jcp.q114.corpus, removePunctuation)
+jcp.q114.corpus <- tm_map(jcp.q114.corpus, removeNumbers)
+removeX <- function(x) gsub("xxx*", "", x)
+jcp.q114.corpus <- tm_map(jcp.q114.corpus, removeX)
+modelStopWords <- stopwords('english')
+library(maps)
+data(us.cities)
+cities.df   <- strsplit(us.cities$name, ' ', fixed=T)
+cities.list <- unlist(cities.df)
+jcp.q114.corpus <- tm_map(jcp.q114.corpus, removeWords, c(modelStopWords, cities.list))
+
+library(SnowballC)
+jcp.q114.corpus <- tm_map(jcp.q114.corpus, stemDocument)
+jcp.q114.corpus <- tm_map(jcp.q114.corpus, PlainTextDocument)
+jcp.q114.tdm <- TermDocumentMatrix(jcp.q114.corpus, control=list(wordLengths=c(3, Inf)))
+jcp.q114.tdm.freq <- findFreqTerms(jcp.q114.tdm, lowfreq=500)
+jcp.q114.tdm.freq.mat <- as.matrix(jcp.q114.tdm.freq)
+#jcp.q114.tdm.mat <- as.matrix(jcp.q114.tdm)
+#jcp.q114.tdm.mat.sort <- sort(rowSums(jcp.q114.tdm.mat), decreasing=T)
+
+#str(distMat)
+#hierCluster(jcp.q114.tdm)
+#dim(jcp.q114.tdm)
+#jcp.q114.tdm.sparse <- removeSparseTerms(jcp.q114.tdm, sparse=0.999)
+#dim(jcp.q114.tdm.sparse)
+#mat <- as.matrix(jcp.q114.tdm.sparse)
+#distMat <- dist(scale(mat), method="man")
+distMat <- adist(jcp.q114.tdm.freq.mat)
+rownames(distMat) <- jcp.q114.tdm.freq
+distMat.dist <- as.dist(distMat)
+
+fit <- hclust(distMat.dist, method="complete")
+plot(fit, cex=0.9, hang=-1, main="Cluster Dendrogram")
+rect.hclust(fit, 10)

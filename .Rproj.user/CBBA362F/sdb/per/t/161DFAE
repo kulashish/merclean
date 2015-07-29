@@ -1,0 +1,17 @@
+{
+    "contents" : "preprocess <- function(x, stop_words) {\n  data.removed <- lapply(x$description, remove_stopwords, stop_words, lines=T)\n  data.clean <- sapply(data.removed, paste0, collapse=',')\n  data.clean <- gsub('[[:space:]]+', ' ', data.clean)\n}\n\nprep0 <- function(pattern, replacement, x) {\n  print(pattern)\n  return (gsub(pattern, replacement, x))\n}\n\nprep <- function(pattern, replacement, x) {\n  print(pattern)\n  matches           <- gregexpr(pattern, x)\n  print(any(unlist(matches) != -1))\n  if(any(unlist(matches) != -1)) {\n    matches.strings   <- regmatches(x, matches)\n    isreplace         <- lapply(matches.strings, '%in%', valid_words)\n    strings.toreplace <- unique(unlist(matches.strings)[unlist(isreplace)==FALSE])\n    remove('matches.strings')\n    remove('matches')\n    cat(\"Number of strings to replace : \", length(strings.toreplace), \"\\n\")\n    index.toreplace   <- grepl(pattern, x) & unlist(lapply(isreplace, function(x) any(x==FALSE)))\n    cat(\"Number of indices : \", sum(index.toreplace==TRUE), \"\\n\")\n    x[index.toreplace==TRUE] <- mgsub_div(x[index.toreplace==TRUE], strings.toreplace, replacement)\n  }\n  return (x)\n}\nmysub   <- function(pattern, replacement, lookup, x, ...) {\n  if (length(pattern)!=length(replacement)) {\n    stop(\"pattern and replacement do not have the same length.\")\n  }\n  result <- x\n  for (i in 1:length(pattern)) {\n    pat       <- paste0(\"\\\\<\", pattern[i], \"\\\\>\")\n    if(lookup[i] == 0)\n      result    <- prep0(pat, replacement[i], result)\n    else\n      result    <- prep(pat, replacement[i], result)\n  }\n  result\n}\n",
+    "created" : 1427642201898.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3528511202",
+    "id" : "161DFAE",
+    "lastKnownWriteTime" : 1427676198,
+    "path" : "C:/Users/akulkarni/RWorkspace/MerchantCleanup/cleanup_header.R",
+    "project_path" : "cleanup_header.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

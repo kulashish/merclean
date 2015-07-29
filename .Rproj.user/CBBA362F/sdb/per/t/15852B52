@@ -1,0 +1,17 @@
+{
+    "contents" : "library(tau)\nlibrary(itertools)\nlibrary(qdap)\nlibrary(maps)\nlibrary(stringr)\nsource(\"cleanup_header.R\")\n\ndata.source <- read.table(file=\"kohl.txt\", sep='|', quote=\"\", comment.char=\"\", numerals=\"no.loss\", col.names = c('transaction_id', 'description', 'container', 'merchant'), stringsAsFactors = F)\n\nwords <- readLines(system.file(\"stopwords\", \"english.dat\", package = \"tm\"))\ndata(us.cities)\nus.states <<- unique(us.cities$country.etc)\n\ndata.source$clean_description <-  preprocess(data.source, words)\nwords.freq.corpus       <- read.csv('freq_words_corpus.txt', header = F, stringsAsFactors = F)\n#words.freq.tf           <- read.csv('freq-words-testframework.txt', header = F, stringsAsFactors = F)\nwords.merchant          <- read.csv('merchant_words.txt', header = T, stringsAsFactors = F)\nword.classes            <- read.csv('word_classes.csv', header = T)\nvalid_words             <<- c(words.freq.corpus$V2, as.character(words.merchant$Word), as.character(word.classes$replace))\nremove(words.freq.corpus)\n\ndata.source$clean_description <- mysub(word.classes$pattern, word.classes$replace, word.classes$status, data.source$clean_description)\n",
+    "created" : 1427642279398.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3550685700",
+    "id" : "15852B52",
+    "lastKnownWriteTime" : 1427676349,
+    "path" : "C:/Users/akulkarni/RWorkspace/MerchantCleanup/cleanup.R",
+    "project_path" : "cleanup.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

@@ -1,0 +1,22 @@
+{
+    "contents" : "",
+    "created" : 1432603516422.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3A3636",
+    "lastKnownWriteTime" : 7741240722073845761,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "caption" : "freq.df",
+        "contentUrl" : "content?title=freq.df&file=bd559c7d4d5b457885a7ac617c0ec6f5.htm",
+        "displayedObservations" : 40,
+        "displayedVariables" : 3,
+        "totalObservations" : 40,
+        "variables" : 2
+    },
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

@@ -1,0 +1,17 @@
+{
+    "contents" : "source(\"perf_report_util.R\")\nlibrary(tm)\nlibrary(SnowballC)\nremoveX <- function(x) gsub(\"xxx*\", \"\", x)\nmodelStopWords <- stopwords('english')\nlibrary(maps)\ndata(us.cities)\ncities.df   <- strsplit(us.cities$name, ' ', fixed=T)\ncities.list <- tolower(unlist(cities.df))\n\ntemp <- function(quarter, table) {\n  cat(table, quarter, \"\\n\")\n  if(quarter=='Q312')\n    return (c(1,2,3))\n  else return (c(1,2,3,5,4))\n}\n\nwords <- function(data) {\n  corpus <- Corpus(VectorSource(data))\n  corpus <- tm_map(corpus, tolower)\n  corpus <- tm_map(corpus, removePunctuation)\n  corpus <- tm_map(corpus, removeNumbers)\n  corpus <- tm_map(corpus, removeX)\n  corpus <- tm_map(corpus, removeWords, c(modelStopWords, cities.list))\n  corpus <- tm_map(corpus, stemDocument)\n  corpus <- tm_map(corpus, PlainTextDocument)\n  tdm <- TermDocumentMatrix(corpus, control=list(wordLengths=c(3, Inf)))\n  return (tdm$dimnames$Terms)\n}\n\nbag_of_words <- function(table, quarter){\n  query <- paste0(\"select description from \", table, \" where quarter_year='\",quarter, \"' and flag=0\")\n  data <- YodleeInsightsConnector.query(conn, query)\n  return (words(data$description))\n}",
+    "created" : 1432640327723.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1704341174",
+    "id" : "E9D9BA5C",
+    "lastKnownWriteTime" : 1415269796,
+    "path" : "C:/Users/akulkarni/RWorkspace/MerchantCleanup/bag_of_words_util.R",
+    "project_path" : "bag_of_words_util.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

@@ -1,0 +1,17 @@
+{
+    "contents" : "library(qdap)\n#patterns <- c('jcp', 'jcpeny')\n#x <- c('asdc jcp aadmg', 'fdsdfsjcp dfsf')\n#pattern <- patterns[1]\nmer_tagger_single <- function(pattern, x, tag) {\n  matches           <- gregexpr(pattern, x)\n  matches.strings   <- regmatches(x, matches)\n  matches.index     <- grepl(pattern, x)\n  matches.replace   <- paste0(matches.strings, '_', tag)\n  x[matches.index]  <- mgsub(matches.strings[matches.index], matches.replace[matches.index], \n                             x[matches.index])\n  return(x)\n}\n\nmer_tagger <- function(patterns, x, tag) {\n  patterns    <- paste0(\"\\\\<\", patterns, \"\\\\>\")\n  pattern.reg <- paste(patterns, collapse=\"|\")\n  mer_tagger_single(pattern.reg, x, tag)\n}\n\nmer_tagger(patterns, x, 'mer')\n",
+    "created" : 1437471960828.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "4232356762",
+    "id" : "956651B8",
+    "lastKnownWriteTime" : 1427676198,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

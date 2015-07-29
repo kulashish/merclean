@@ -1,0 +1,8 @@
+merchants.df        <- read.csv('merchants.csv', header=T, stringsAsFactors=F)
+merchants.list      <- c(merchants.df[, 1], merchants.df[, 3])
+merchants.words.list <- lapply(merchants.list, strsplit, '\\W+', perl=T)
+merchants.words.vec <- unlist(merchants.words.list)
+merchants.words.freq <- table(merchants.words.vec)
+merchants.words.freq.sorted <- sort(merchants.words.freq, decreasing=T)
+merchants.sorted.table <- paste(names(merchants.words.freq.sorted), merchants.words.freq.sorted, sep="\t")
+cat('Word\tFREQ', merchants.sorted.table, file='merchant_words.txt', sep='\n')

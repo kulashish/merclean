@@ -1,0 +1,17 @@
+{
+    "contents" : "source('../global/redshift_conn.R')\nquery.table.panel   <- 'yi_base_views.bank_panel'\nquery.date    <- \"where file_created_date >= '2014-12-01' and file_created_date <= '2014-12-15'\"\nquery.limit   <- 'limit 10000000'\nquery.final   <- paste(\"select description from\", query.table, query.date, \"order by random()\", query.limit)\nquery.result  <- YodleeInsightsConnector.query(conn, query.final)\n\nquery.table.tf.train   <- 'yi_stage_clean.test_framework_01_training'\nquery.tf      <- paste('select description from', query.table.tf.train, 't, ', query.table.panel, 'p', 'where t.transaction_id = p.transaction_id')\nquery.result  <- YodleeInsightsConnector.query(conn, query.tf)\n\nlibrary(tm)\ncorpus  <- Corpus(VectorSource(query.result$description))\n#jcp.q114.corpus <- tm_map(jcp.q114.corpus, tolower)\n#jcp.q114.corpus <- tm_map(jcp.q114.corpus, removePunctuation)\n#jcp.q114.corpus <- tm_map(jcp.q114.corpus, removeNumbers)\n#removeX <- function(x) gsub(\"xxx*\", \"\", x)\n#jcp.q114.corpus <- tm_map(jcp.q114.corpus, removeX)\nmodelStopWords <- stopwords('english')\n#library(maps)\n#data(us.cities)\n#cities.df   <- strsplit(us.cities$name, ' ', fixed=T)\n#cities.list <- unlist(cities.df)\n#jcp.q114.corpus <- tm_map(jcp.q114.corpus, removeWords, c(modelStopWords, cities.list))\ncorpus    <- tm_map(corpus, removeWords, modelStopWords)\nlibrary(SnowballC)\ncorpus    <- tm_map(corpus, stemDocument)\ncorpus    <- tm_map(corpus, PlainTextDocument)\ntdm       <- TermDocumentMatrix(corpus, control=list(wordLengths=c(3, Inf)))\ntdm.freq  <- findFreqTerms(tdm, lowfreq=10)\n\ntdm.mat       <- as.matrix(tdm)\ntdm.mat.sort  <- sort(rowSums(tdm.mat), decreasing=T)\n\ntemp      <- inspect(tdm)\nFreqMat   <- data.frame(apply(temp, 1, sum))\nFreqMat   <- data.frame(ST = row.names(FreqMat), Freq = FreqMat[, 1])\nFreqMat   <- FreqMat[order(FreqMat$Freq, decreasing = T), ]\nrow.names(FreqMat) <- NULL\nView(FreqMat)\n\nwrite(tdm.freq, file=\"freq.txt\")\n\nresult.words.list   <- lapply(query.result[, 1], strsplit, '\\\\W+', perl=TRUE)\nresult.words.vec    <- unlist(result.words.list)\nresult.freq.list    <- table(result.words.vec)\nresult.freq.list.sorted <- sort(result.freq.list, decreasing=TRUE)\nresult.sorted.table <- paste(names(result.freq.list.sorted), result.freq.list.sorted, sep=\"\\t\")\ncat('Word\\tFREQ', result.sorted.table, file='tf_freq_words.txt', sep='\\n')\n",
+    "created" : 1429679753161.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3133995034",
+    "id" : "159BE8FB",
+    "lastKnownWriteTime" : 1421877996,
+    "path" : "C:/Users/akulkarni/RWorkspace/MerchantCleanup/freq_words.R",
+    "project_path" : "freq_words.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
